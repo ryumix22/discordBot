@@ -2,7 +2,7 @@ import httplib2
 import apiclient
 from oauth2client.service_account import ServiceAccountCredentials
 
-CREDENTIALS_FILE = 'discordcinema-0865928fc329.json'
+CREDENTIALS_FILE = 'google-credentials.json'
 spreadsheets_id = '1UeX3KFw_7Ed5zosY1cBok2fX5iSui13-VIYwjG-qzmY'
 
 credentials = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE,

@@ -1,10 +1,7 @@
 import discord
 import os
 import time
-import numpy as np
-import schedule as sch
 import TableWrapper as tbl
-from TableWrapper import Film
 from dotenv import load_dotenv
 from discord.ext import commands, tasks
 from dataclasses import dataclass

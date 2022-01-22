@@ -1,0 +1,5 @@
+discord.py
+pythin-dotenv
+google-python-api-client
+google-auth-httplib2
+google-auth-oauthlib
