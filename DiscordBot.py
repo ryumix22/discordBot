@@ -1,10 +1,10 @@
-import discord
 import os
 import time
 import TableWrapper as tbl
 from dotenv import load_dotenv
 from discord.ext import commands, tasks
 from dataclasses import dataclass
+import discord
 
 
 @dataclass
