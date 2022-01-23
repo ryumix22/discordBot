@@ -5,12 +5,12 @@ import os
 from oauth2client.service_account import ServiceAccountCredentials
 
 client_secret = os.environ.get('GOOGLE_CREDENTIALS')  # This pulls your variable out of Config Var and makes it available
-if client_secret is None:  # This is to detect if you're working locally and the Config Var therefore isn't available
-    print('\n\nResorted to local JSON file.\n\n')
-    with open('google-credentials.json') as json_file: # ... so it pulls from the locally stored JSON file.
-        client_secret = json.load(json_file)
-else:
-    client_secret = json.loads(client_secret) # This converts the Config Var to JSON for OAuth
+# if client_secret is None:  # This is to detect if you're working locally and the Config Var therefore isn't available
+#     print('\n\nResorted to local JSON file.\n\n')
+#     with open('google-credentials.json') as json_file: # ... so it pulls from the locally stored JSON file.
+#         client_secret = json.load(json_file)
+# else:
+client_secret = json.loads(client_secret) # This converts the Config Var to JSON for OAuth
 
 CREDENTIALS_FILE = 'google-credentials.json'
 spreadsheets_id = '1UeX3KFw_7Ed5zosY1cBok2fX5iSui13-VIYwjG-qzmY'
