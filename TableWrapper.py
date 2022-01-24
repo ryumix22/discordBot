@@ -43,7 +43,7 @@ class Table:
         tmpFilmsList = []
         for i in range(4, self.sizeDown + 1):
             tmpRow = sheets.getRowsValues('A', 'F', i)
-            if tmpRow[0].strip():
+            if tmpRow is not None:
                 tmpFilmsList.append(
                     Film(i, tmpRow[0], tmpRow[5], tmpRow[3], tmpRow[4], status=tmpRow[1], place=tmpRow[2]))
         self.films = tmpFilmsList

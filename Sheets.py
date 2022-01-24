@@ -41,11 +41,19 @@ service = apiclient.discovery.build('sheets', 'v4', http=httpAuth)
 
 # values = service.spreadsheets().values().get(
 #         spreadsheetId=spreadsheets_id,
-#         range='A4:A30',
-#         majorDimension='COLUMNS'
+#         range='A4:A39',
+#         majorDimension='ROWS'
 #     ).execute()
 #
-# print(values.get('values')[0])
+# print(values.get('values'))
+
+# values = service.spreadsheets().values().get(
+#         spreadsheetId=spreadsheets_id,
+#         range='A37:F37',
+#         majorDimension='ROWS'
+#     ).execute()
+#
+# print(values.get('values'))
 
 
 def getLastColumn():
@@ -83,7 +91,8 @@ def getRowsValues(startRowName: str, endRowName: str, index):
         range=tableRange,
         majorDimension='ROWS'
     ).execute()
-    return values.get('values')[0]
+    if values.get('values') is not None:
+        return values.get('values')[0]
 
 
 def setCellValue(cell: str, value: str):

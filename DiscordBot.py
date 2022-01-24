@@ -238,7 +238,35 @@ async def help(ctx):
     embed.add_field(name='-filmsinfo', value='Вывовид список всех фильмов с возможностью просмотра подробной информации', inline=False)
     embed.add_field(name='-watched', value='Выводит список просмотренных фильмов', inline=False)
     embed.add_field(name='-announcenext "время(без ковычек)"', value='Создает оповещение о просмотре фильма. В начале сообщения имеется слово "Через", учитывайте это при указания времени в команде', inline=False)
+    embed.add_field(name='-tablelink', value='Выводит ссылку на гугл таблицу', inline=False)
+    embed.add_field(name='-votefilm "название фильма(в ковычках)"', value='Создает оповещение с голосованием, о том что будем смотреть указанный фильм', inline=False)
     await ctx.send(embed=embed)
+
+
+@bot.command()
+async def tablelink(ctx):
+    await ctx.send('Сслыка на таблицу.\nhttps://docs.google.com/spreadsheets/d/1UeX3KFw_7Ed5zosY1cBok2fX5iSui13-VIYwjG-qzmY/edit#gid=0')
+
+
+@bot.command()
+async def votefilm(ctx, *, args):
+    channel = bot.get_channel(933512604784148520)
+    filmStr = ''.join(args)
+    if filmStr[0] == '"' and filmStr[len(filmStr) - 1] == '"':
+        filmStr = filmStr[1:-1]
+        for film in table.films:
+            print(film.name.lower(), filmStr.lower())
+            if film.name.lower().find(filmStr.lower()) > -1:
+                embed = createInfoAboutFilm(film)
+                message = await channel.send(content='{},\n Сегодня вечером смотрим `{}`. Точное время определится позже.\nГолосуйте будете ли вы смотреть.'.format(
+                    ctx.guild.get_role(934185307933380608).mention, film.name), embed=embed)
+                await message.add_reaction('✅')
+                await message.add_reaction('❌')
+                return
+        await channel.send('Фильм не найден(\nПроверьте правильно ли написано название.')
+    else:
+        await ctx.send('Название фильма указывается внутри ковычек: -votefilm "film name"')
+
 
 updateTableLoop.start()
 bot.run(TOKEN)
