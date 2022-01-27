@@ -14,6 +14,7 @@ class Info:
 
 
 info = Info()
+time.sleep(120)
 table = tbl.Table()
 time.sleep(20)
 
