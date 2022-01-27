@@ -14,9 +14,9 @@ class Info:
 
 
 info = Info()
-time.sleep(120)
+time.sleep(60)
 table = tbl.Table()
-time.sleep(20)
+time.sleep(60)
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -28,7 +28,7 @@ bot = commands.Bot(command_prefix='-', intents=intents, help_command=None)
 emojiNumList = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
 
 
-@tasks.loop(seconds=60)
+@tasks.loop(seconds=90)
 async def updateTableLoop():
     try:
         table.updateTable()
