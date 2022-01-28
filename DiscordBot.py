@@ -73,9 +73,11 @@ async def announcenext(ctx, *, time: list):
     # my id 934194081490415698
     # kur id 934185307933380608
     nextFilm = table.getSoonestFilm()
-    message = await ctx.send('{}, Через {} мы будем смотреть фильм! Текущий фильм для просмотра:\n'
-                             '    > {}\n\n Отмечайте, будете ли вы смотреть кино.'.format(
-        ctx.guild.get_role(934185307933380608).mention, ''.join(time), nextFilm.name))
+    channel = bot.get_channel(933512604784148520)
+    message = await channel.send(
+        '{}, Через {} мы будем смотреть фильм! Текущий фильм для просмотра:\n'
+        '    > {}\n\n Отмечайте, будете ли вы смотреть кино.'.format(
+            ctx.guild.get_role(934185307933380608).mention, ''.join(time), nextFilm.name))
     await message.add_reaction('✅')
     await message.add_reaction('❌')
 
@@ -134,7 +136,8 @@ async def films(ctx):
 
 
 def createContentForFilmInfo(groups):
-    retStr = 'Список всех фильмов. Для управления, воспользуйтесь кнопками снизу.\nТекущая страница {}:\n'.format(info.currentPage + 1)
+    retStr = 'Список всех фильмов. Для управления, воспользуйтесь кнопками снизу.\nТекущая страница {}:\n'.format(
+        info.currentPage + 1)
     for i, name in enumerate(groups[info.currentPage]):
         retStr.format(1)
         retStr += ' > ' + emojiNumList[i] + ' ' + name + '\n'
@@ -151,7 +154,7 @@ def createInfoAboutFilm(film):
     return embed
 
 
-@bot.command() # good; later connect kinopoisk api
+@bot.command()  # good; later connect kinopoisk api
 async def filmsinfo(ctx):
     info.currentPage = 0
     filmsArr = table.films
@@ -161,10 +164,10 @@ async def filmsinfo(ctx):
     info.countOfGroups = len(groups)
     retStr = createContentForFilmInfo(groups)
     message = await ctx.send(retStr)
-    print(info.countOfGroups)
     for i in range(len(groups[0])):
         await message.add_reaction(emojiNumList[i])
-    await message.add_reaction('⬇')
+    if len(groups[0]) == 10:
+        await message.add_reaction('⬇')
 
     def check(reaction, user):
         return user == ctx.author and (str(reaction.emoji) in emojiNumList or str(
@@ -192,7 +195,15 @@ async def filmsinfo(ctx):
                 await message.edit(content=retStr)
                 # await message.remove_reaction('⬇', user)
                 if info.currentPage == len(groups) - 1:
-                    await message.clear_reaction('⬇')
+                    if len(groups[info.currentPage]) < 10:
+                        await message.clear_reaction('⬆')
+                        await message.clear_reaction('⬇')
+                        print(len(groups[info.currentPage]))
+                        for i in range(9, len(groups[info.currentPage]) - 1, -1):
+                            await message.clear_reaction(emojiNumList[i])
+                        await message.add_reaction('⬆')
+                    else:
+                        await message.clear_reaction('⬇')
 
             if str(reaction.emoji) == '⬆':
                 if user != ctx.author:
@@ -203,6 +214,12 @@ async def filmsinfo(ctx):
                 info.currentPage -= 1
                 retStr = createContentForFilmInfo(groups)
                 await message.edit(content=retStr)
+                if info.currentPage == len(groups) - 2 and info.currentPage != 0:
+                    await message.clear_reactions()
+                    for i in range(len(groups[info.currentPage])):
+                        await message.add_reaction(emojiNumList[i])
+                    await message.add_reaction('⬆')
+                    await message.add_reaction('⬇')
                 # await message.remove_reaction('⬆', user)
                 if info.currentPage == 0:
                     await message.clear_reaction('⬆')
@@ -236,17 +253,22 @@ async def help(ctx):
     embed = discord.Embed(title='Список Команд', colour=discord.Colour.orange())
     embed.add_field(name='-films', value='Выводит список всех фильмов', inline=False)
     embed.add_field(name='-planned', value='Выводит список запланированных фильмов', inline=False)
-    embed.add_field(name='-filmsinfo', value='Вывовид список всех фильмов с возможностью просмотра подробной информации', inline=False)
+    embed.add_field(name='-filmsinfo',
+                    value='Вывовид список всех фильмов с возможностью просмотра подробной информации', inline=False)
     embed.add_field(name='-watched', value='Выводит список просмотренных фильмов', inline=False)
-    embed.add_field(name='-announcenext "время(без ковычек)"', value='Создает оповещение о просмотре фильма. В начале сообщения имеется слово "Через", учитывайте это при указания времени в команде', inline=False)
+    embed.add_field(name='-announcenext "время(без ковычек)"',
+                    value='Создает оповещение о просмотре фильма. В начале сообщения имеется слово "Через", учитывайте это при указания времени в команде',
+                    inline=False)
     embed.add_field(name='-tablelink', value='Выводит ссылку на гугл таблицу', inline=False)
-    embed.add_field(name='-votefilm "название фильма(в ковычках)"', value='Создает оповещение с голосованием, о том что будем смотреть указанный фильм', inline=False)
+    embed.add_field(name='-votefilm "название фильма(в ковычках)"',
+                    value='Создает оповещение с голосованием, о том что будем смотреть указанный фильм', inline=False)
     await ctx.send(embed=embed)
 
 
 @bot.command()
 async def tablelink(ctx):
-    await ctx.send('Сслыка на таблицу.\nhttps://docs.google.com/spreadsheets/d/1UeX3KFw_7Ed5zosY1cBok2fX5iSui13-VIYwjG-qzmY/edit#gid=0')
+    await ctx.send(
+        'Сслыка на таблицу.\nhttps://docs.google.com/spreadsheets/d/1UeX3KFw_7Ed5zosY1cBok2fX5iSui13-VIYwjG-qzmY/edit#gid=0')
 
 
 @bot.command()
@@ -259,8 +281,9 @@ async def votefilm(ctx, *, args):
             print(film.name.lower(), filmStr.lower())
             if film.name.lower().find(filmStr.lower()) > -1:
                 embed = createInfoAboutFilm(film)
-                message = await channel.send(content='{},\n Сегодня вечером смотрим `{}`. Точное время определится позже.\nГолосуйте будете ли вы смотреть.'.format(
-                    ctx.guild.get_role(934185307933380608).mention, film.name), embed=embed)
+                message = await channel.send(
+                    content='{},\n Сегодня вечером смотрим `{}`. Точное время определится позже.\nГолосуйте будете ли вы смотреть.'.format(
+                        ctx.guild.get_role(934185307933380608).mention, film.name), embed=embed)
                 await message.add_reaction('✅')
                 await message.add_reaction('❌')
                 return
