@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from discord.ext import commands, tasks
 from dataclasses import dataclass
 import discord
+import Kinopoisk as kp
 
 
 @dataclass
@@ -14,9 +15,9 @@ class Info:
 
 
 info = Info()
-time.sleep(60)
+# time.sleep(60)
 table = tbl.Table()
-time.sleep(60)
+# time.sleep(60)
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -36,11 +37,11 @@ async def updateTableLoop():
         print('Google Flood sec')
 
 
-@bot.event
-async def on_ready():
-    # my id 933787505591992363
-    # kur id 933512604784148520
-    await bot.get_channel(933512604784148520).send('Привет. Бот работает')
+# @bot.event
+# async def on_ready():
+#     # my id 933787505591992363
+#     # kur id 933512604784148520
+#     await bot.get_channel(933512604784148520).send('Привет. Бот работает')
 
 
 # @bot.event
@@ -135,6 +136,30 @@ async def films(ctx):
 #     await message.add_reaction('✅')
 
 
+def createKPInfo(film, name):
+    kpFilm = kp.getFilmByName(name)
+    filmGenres = kp.getListOfGenres(kpFilm.kinopoisk_id)
+    genresStr = ''
+    for i in range(len(filmGenres)):
+        if i != len(filmGenres) - 1:
+            genresStr += filmGenres[i] + ', '
+        else:
+            genresStr += filmGenres[i]
+    embed = discord.Embed(title=film.name, colour=discord.Colour.orange())
+    embed.set_image(url=kpFilm.poster_url)
+    embed.add_field(name='Год', value=kpFilm.year, inline=True)
+    embed.add_field(name='Жанры', value=genresStr, inline=True)
+    embed.add_field(name='Предложил:', value=film.author, inline=True)
+    embed.add_field(name='Статус:', value=film.status, inline=False)
+    if film.description:
+        embed.add_field(name='Комментарий:', value=film.description, inline=False)
+    embed.add_field(name='Рейтинг Курятника:', value=film.rate, inline=True)
+    embed.add_field(name='Рейтинг Кинопоиск', value=kpFilm.rating_kinopoisk, inline=True)
+    embed.add_field(name='Рейтинг IMDb', value=kpFilm.rating_imdb, inline=True)
+    embed.add_field(name='Ссылка на КиноПоиск', value=kpFilm.web_url, inline=False)
+    return embed
+
+
 def createContentForFilmInfo(groups):
     retStr = 'Список всех фильмов. Для управления, воспользуйтесь кнопками снизу.\nТекущая страница {}:\n'.format(
         info.currentPage + 1)
@@ -182,6 +207,7 @@ async def filmsinfo(ctx):
                     if str(reaction.emoji) == curEmoji:
                         curFilm = filmsGroup[info.currentPage][i]
                         filmString = createInfoAboutFilm(curFilm)
+                        # filmString = createKPInfo(curFilm, curFilm.name)
                         await ctx.send(embed=filmString)
                         await message.clear_reactions()
                         return
@@ -280,7 +306,7 @@ async def votefilm(ctx, *, args):
         for film in table.films:
             print(film.name.lower(), filmStr.lower())
             if film.name.lower().find(filmStr.lower()) > -1:
-                embed = createInfoAboutFilm(film)
+                embed = createKPInfo(film, filmStr)
                 message = await channel.send(
                     content='{},\n Сегодня вечером смотрим `{}`. Точное время определится позже.\nГолосуйте будете ли вы смотреть.'.format(
                         ctx.guild.get_role(934185307933380608).mention, film.name), embed=embed)
@@ -289,8 +315,26 @@ async def votefilm(ctx, *, args):
                 return
         await channel.send('Фильм не найден(\nПроверьте правильно ли написано название.')
     else:
-        await ctx.send('Название фильма указывается внутри ковычек: -votefilm "film name"')
+        await channel.send('Название фильма указывается внутри ковычек: -votefilm "film name"')
 
+
+# @bot.command()
+# async def testfilmkp(ctx, *, args):
+#     filmStr = ''.join(args)
+#     if filmStr[0] == '"' and filmStr[len(filmStr) - 1] == '"':
+#         filmStr = filmStr[1:-1]
+#         for film in table.films:
+#             print(film.name.lower(), filmStr.lower())
+#             if film.name.lower().find(filmStr.lower()) > -1:
+#                 embed = createKPInfo(film, filmStr)
+#                 message = await ctx.send(
+#                     content='Сегодня вечером смотрим `{}`. \nГолосуйте будете ли вы смотреть.'.format(film.name), embed=embed)
+#                 await message.add_reaction('✅')
+#                 await message.add_reaction('❌')
+#                 return
+#         await ctx.send('Фильм не найден(\nПроверьте правильно ли написано название.')
+#     else:
+#         await ctx.send('Название фильма указывается внутри ковычек: -votefilm "film name"')
 
 updateTableLoop.start()
 bot.run(TOKEN)

@@ -26,6 +26,7 @@ httplib2==0.20.2
 icalendar==4.0.9
 idna==2.10
 joblib==1.1.0
+kinopoisk-api-unofficial-client==2.0.0
 kiwisolver==1.2.0
 matplotlib==3.3.2
 mpmath==1.1.0
