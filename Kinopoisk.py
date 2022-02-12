@@ -6,8 +6,9 @@ from pprint import pprint
 import kinopoisk_unofficial.response.films.film_response as resp
 
 
-kpAPIKey = os.getenv('KINOPOISKAPIKEY')
-apiClient = KinopoiskApiClient(kpAPIKey)
+# kpAPIKey = os.getenv('KINOPOISKAPIKEY')
+# apiClient = KinopoiskApiClient(kpAPIKey)
+apiClient = KinopoiskApiClient('a0ce66c9-347f-478e-a996-cf28bc2c774c')
 
 
 def getFilmByName(name: str):
